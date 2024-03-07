@@ -26,6 +26,5 @@ mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP_RCV), socket.INADDR_ANY)
 sock_rcv.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 while True:
-  # For Python 3, change next line to "print(sock.recv(10240))"
-  message = sock_rcv.recv(10240)
+  message = sock_rcv.recv(4096)
   sock_repub.sendto(message, (MCAST_GRP_REPUB, MCAST_PORT_REPUB))
