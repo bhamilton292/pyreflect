@@ -2,28 +2,31 @@ import argparse
 import socket
 import struct
 import psutil
+from ipaddress import IPv4Address, AddressValueError
 
 def validate_multicast_ip(ip):
- 
-  octets = ip.split('.')
-  if len(octets) == 4:
-    if 224 <= int(octets[0]) <= 239:
-      for octet in octets[1:]:
-        if 0 <= int(octet) <= 255:
-          return True
-  print(f'error: {ip} is not a valid multicast ip address (not in 224.0.0.0/4)')
+
+  try:
+    if IPv4Address(ip).is_multicast:
+      return True
+  except AddressValueError:
+    pass 
+
+  print(f'error: {ip} is not a valid IPv4 multicast address')
   return False
-         
+ 
 
 def validate_mgroups(args):
-
-  print(args)
 
   if args.mgroup_listen == args.mgroup_repub:
     print(f'error: arguments mgroup-listen and mgroup-repub cannot be the same (both are \'{args.mgroup_listen}\')')
     exit(1)
 
-  if not (validate_multicast_ip(args.mgroup_listen) and validate_multicast_ip(args.mgroup_repub)):
+  # checked in separate lines to ensure error messages are logged for both when both have bad values
+  check_first = validate_multicast_ip(args.mgroup_listen)
+  check_second = validate_multicast_ip(args.mgroup_repub)
+
+  if not (check_first and check_second):
     exit(2)
 
 
