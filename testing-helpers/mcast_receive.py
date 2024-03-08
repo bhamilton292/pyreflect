@@ -2,7 +2,7 @@ import socket
 import struct
 
 MCAST_GRP = '224.0.0.98'
-MCAST_PORT = 5008
+MCAST_PORT = 5007
 IS_ALL_GROUPS = True
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
