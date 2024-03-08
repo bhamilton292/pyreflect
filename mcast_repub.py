@@ -67,17 +67,20 @@ def main():
   sock_rcv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
   sock_rcv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-  print(f'Binding to {args.mgroup_listen}:{args.port}')
+  print(f'Binding to {args.mgroup_listen}:{args.port} on {args.interface}')
   sock_rcv.bind((args.mgroup_listen, args.port))
 
   mreq = struct.pack("4s4s", socket.inet_aton(args.mgroup_listen), socket.inet_aton(listen_iface))
   sock_rcv.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+  print(f'Republishing to {args.mgroup_repub}:{args.port} out default interface')
   sock_repub = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
   sock_repub.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
 
   while True:
     message = sock_rcv.recv(4096)
+    print(f'Received message on {args.mgroup_listen}:{args.port}, republishing to {args.mgroup_repub}:{args.port}')
+    print(f'Message: {message}')
     sock_repub.sendto(message, (args.mgroup_repub, args.port))
 
 
